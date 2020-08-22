@@ -12,15 +12,18 @@ youtube links
 
 declaracad, .enaml file
 
-[](src/bridge.enaml)
+[source](src/bridge.enaml)
 
 ### Rendered images
 
-![Rendered CAD model](output/bridge-rendered.png)
-![Transparent render](output/bridge-rendered-transparent.png)
+![Rendered CAD model](output/bridge-render.png)
+![Transparent render](output/bridge-render-transparent.png)
 
-I was able to export a .step file, import that into FreeCAD and generate a drawing.
-[](output/bridge.step)
+I was able to export a .step file
+
+[exported](output/bridge.step)
+
+Imported into FreeCAD and generated a drawing.
 
 ![Technical drawing detail](output/bridge-drawing.png)
 [Full page drawing](output/bridge-drawing.pdf)

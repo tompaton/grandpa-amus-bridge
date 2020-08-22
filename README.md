@@ -74,4 +74,3 @@ It was then finished with a few coats of shellac.
 
 * 3D printed plastic model
 * paper model
-

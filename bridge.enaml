@@ -1,0 +1,603 @@
+from math import pi, sqrt, atan2, cos, sin
+from declaracad.occ.api import *
+
+D = 8  # log diameter
+B = 6  # bar width
+B_cut = B / 10  # shoulder cut for tenons
+W = 10  # tread board width
+L = 135  # front/back log length
+T = 120 # top log length
+S = ((2 + 10 + 10 + 10 + 2) * W + 4 * B) / 2 # side log length
+YL = D*3  # front log overlap
+YT = D*3.5 # top log overlap
+A = pi/6  # leg angle
+top_bar_y = (((D)/sin(A))*cos(A) # bottom of leg touches top of top log at this point
+             + ((B/2)/sin(A))*cos(A) # top of bar touches bottom of leg at this point
+             + B/2) # move so it's the edge, not center
+support_mortise_y = L*5/8 + YL
+SL = support_mortise_y * sin(A) - D/2  # support log length
+
+print('Logs')
+print('Top 3 x %.1f' % T)
+print('Front/ Back 8 x %.1f' % L)
+print('Long side 4 x %.1f' % S)
+print('Support 4 x %.1f' % SL)
+
+print('Cuts')
+print(' T T T F F F F L S S = %.1f' % (3*T + 4*L + S + 2*SL))
+print(' B B B B L L L S S = %.1f' % (4*L + 3 * S + 2*SL))
+
+enamldef Log(Part):
+    attr l
+    Cylinder:
+        radius = D / 2
+        height = l
+        direction = (0, 1, 0)
+    
+enamldef DoveTail(Part):
+    attr a = 1 / 7
+    attr w = B
+    attr h = B
+    attr d = 2*D
+    Prism:
+        vector = (d, 0, 0)
+        Face:
+            Wire:
+                Polyline:
+                    closed = True
+                    points = [(0, 0, 0), (0, w, 0),
+                              (0, w-(a*0.5*h), h*0.5), (0, w, 0.5*h),
+                              (0, w, h),  (0, 0, h),
+                              (0, 0, 0.5*h),  (0, a * 0.5 * h, 0.5 * h)]
+    position = (-d/2, -w/2, -h/2)
+
+enamldef DoveTail2(Part):
+    attr a = 1 / 7
+    attr w = B
+    attr h = B
+    attr d = 2*D
+    Prism:
+        vector = (d, 0, 0)
+        Face:
+            Wire:
+                Polyline:
+                    closed = True
+                    # TODO: small flange between dovetail ends
+                    points = [(0, 0, 0), (0, w, 0),
+                              (0, w-(a*0.5*h), h*0.5),
+                              #(0, w, 0.5*h),
+                              (0, w, h),  (0, 0, h),
+                              #(0, 0, 0.5*h),
+                              (0, a * 0.5 * h, 0.5 * h)]
+    position = (-d/2, -w/2, -h/2)
+
+enamldef Bar(Part):
+    attr n = 1
+
+    DoveTail:
+        d = (n * 2 - 1) * D
+        w = B
+        h = B
+
+enamldef Bar2(Part):
+    attr n = 1
+
+    DoveTail2:
+        d = (n * 2 - 1) * D
+        w = B
+        h = B
+
+front_log_transform = [Translate(y=-(T/2-YT)), Rotate(direction=(1,0,0), angle=A)]
+
+enamldef TopBarsPositioned(Part):
+    Bar:
+        n = 5
+        position = (0, -(T/2 - YT) + top_bar_y, 0)
+    Bar:
+        n = 5
+        position = (0, (T/2 - YT) - top_bar_y, 0)
+    Bar2:
+        n = 5
+        position = (0, -T/2+D, 0)
+    Bar2:
+        n = 5
+        position = (0, T/2-D, 0)
+    
+    position = (0, 0, D/2)
+
+enamldef FrontBars(Part):
+    Bar:
+        n = 4.5
+        position = (0, -top_bar_y, 0)
+    Bar:
+        n = 5
+        position = (0, -L/2, 0)
+
+    position = (0, 0, D/2)
+
+enamldef TreadBars(Part):
+    Bar:
+        n = 5.5
+        position = (0, -5 * W - B, 0)
+    Bar:
+        n = 5.5
+        position = (0, 5 * W, 0)
+    Bar:
+        n = 5.5
+        position = (0, -15 * W - B*2, 0)
+    Bar:
+        n = 5.5
+        position = (0, 15 * W + B, 0)
+    
+    position = (0, D/4, D*3/2)
+
+enamldef TopLogs(Part):
+    Log: 
+        l = T
+        position = (-2*D, 0, 0)
+    Log: 
+        l = T
+        position = (0, 0, 0)
+    Log: 
+        l = T
+        position = (2*D, 0, 0)
+    position = (0, -T/2, 0)
+
+enamldef SupportMortise(Part):
+    Box:
+        dy = D
+        dx = D/4
+        dz = D
+        position = (-D/8, -D/2, -D/2)
+
+enamldef FrontLeft(Part):
+    Transform:
+        Cut:
+            Part:
+                Log:
+                    l = L
+                    position = (0, -(L-YL), 0)
+                Sphere:
+                    radius = D/4
+                    display = False
+            SupportMortise:
+                position = (0, -support_mortise_y + YL-D/4, D/2)
+                
+        operations = [Rotate(direction=(0,0,1), angle=-pi/40),
+                      Translate(x=-3*D)]
+
+    Transform:
+        Part:
+            Log:
+                l = L
+                position = (0, -(L-YL), 0)
+            Sphere:
+                radius = D/4
+                display = False
+        operations = [Rotate(direction=(0,0,1), angle=-pi/80),
+                      Translate(x=-D)]
+
+enamldef FrontLogsPositioned(Part):
+    Cut:
+        Transform:
+            Cut:
+                Part:
+                    FrontLeft: pass
+                    Transform:
+                        FrontLeft: pass
+                        operations = [Mirror(x=1, plane=True)]
+                FrontBars: pass
+
+            operations = front_log_transform
+
+        TopBarsPositioned: pass
+
+        # chop tops of front logs
+        Box:
+            dx = 8 * D
+            dy = 3 * D * cos(A)
+            dz = D*2 * sin(A)
+            position = (-4*D,
+                        -(T/2 - YT) + YL * cos(A) - dy/2,
+                        YL * sin(A) - D/5)
+
+# TODO: side logs should really be curved over
+
+enamldef FrontSideLog(Part):
+    Cut:
+        Log:
+            l = S
+            position = (0, 0, 0)
+        Transform:
+            DoveTail:
+                d = D
+                w = D / 4
+                h = D
+            operations = [Rotate(angle=pi/2, direction=(0,1,0)),
+                                        Rotate(angle=-pi/2, direction=(1,0,0)),
+                                        Translate(z=S)]
+
+enamldef LeftFront(Part):
+    Cut:
+        FrontSideLog:
+            position = (-D*4, -S + D/4, D)
+        SupportMortise:
+            position = (-D*4, -support_mortise_y*cos(A)-D*3/2, D/2)
+
+enamldef LeftBack(Part):
+    Cut:
+        Log:
+            l = S
+            position = (-D*4, -D/4, D)
+        LeftFront: pass
+        SupportMortise:
+            position = (-D*4, support_mortise_y*cos(A)+D*3/2, D/2)
+
+enamldef PostTenon(Part):
+    Box:
+        dx=B/2
+        dy=B
+        dz = B
+        position = (B_cut, 0, -B)
+        
+enamldef PostTenons(Part):
+    PostTenon:
+        position = (-B_cut, -3*W, D*3/2)
+    PostTenon:
+        position = (-B_cut, 3*W-B, D*3/2)
+    PostTenon:
+        position = (-B_cut, -9*W-B*2, D*3/2)
+    PostTenon:
+        position = (-B_cut, 9*W + B, D*3/2)
+    PostTenon:
+        position = (-B_cut, -16*W-B*3, D*3/2)
+    PostTenon:
+        position = (-B_cut, 16*W + 2*B, D*3/2)
+
+enamldef SideLogsPositioned(Part):
+    Cut:
+        Part:
+            LeftFront: pass
+            LeftBack: pass
+            Transform:
+                Part:
+                    LeftFront: pass
+                    LeftBack: pass
+                operations = [Mirror(x=1, plane=True)]
+        TopBarsPositioned: pass
+        TreadBars: pass
+
+        PostTenons: 
+            position = (-4*D, 0, 0)
+        PostTenons: 
+            position = (4*D - B/2, 0, 0)
+
+enamldef LeftFrontSupport(Part):
+    # TODO: Cut here is slow?
+    Cut:
+        Part:
+            Transform:
+                Log:
+                    l = SL
+                operations = [Rotate(angle=pi/2, direction=(1, 0, 0))]
+            position = (-D*4, -support_mortise_y*cos(A)-D*3/2, -support_mortise_y*sin(A)+D*3/2)
+        LeftFront: pass
+        FrontLogsPositioned: pass
+
+enamldef LeftBackSupport(Part):
+    Transform:
+        LeftFrontSupport: pass
+        operations = [Mirror(y=1, plane=True)]
+
+
+enamldef RailTenon(Part):
+    Box:
+        dx=B/2-2*B_cut
+        dy=B/4
+        dz = B*3/4
+        position = (B/8+B_cut, B/4, -B/2)
+
+enamldef Rail(Part):
+    attr l
+    Fuse:
+        Box:
+            dx=B/2
+            dy=l - B
+            dz = B
+            position = (B/8, B, 0)
+        RailTenon:
+            position = (0, B/2, B*5/8)
+        RailTenon:
+            position = (0, l-B/4,B*5/8)
+
+enamldef Rails(Part):
+    attr l = 6 * W
+    attr base = D+B+D/5-B_cut
+    Rail:
+        l = 6*W - B
+        position = (0, -3*W, 6 * D)
+    Rail:
+        l = 6*W - B
+        position = (0, -3*W, base)
+    Rail:
+        l = 6*W+2*B
+        position = (0, 3*W-B, 5 * D)
+    Rail:
+        l = 6*W+2*B
+        position = (0, 3*W-B, base)
+    Rail:
+        l = 7*W + B
+        position = (0, 9*W+B, 4 * D)
+    Rail:
+        l = 7*W + B
+        position = (0, 9*W+B, base)
+    Rail:
+        l = 6*W+2*B
+        position = (0, -9*W-2*B, 5 * D)
+    Rail:
+        l = 6*W+2*B
+        position = (0, -9*W-2*B, base)
+    Rail:
+        l = 7*W + B
+        position = (0, -16*W-3*B, 4 * D)
+    Rail:
+        l = 7*W + B
+        position = (0, -16*W-3*B, base)
+
+enamldef LeftRailsPositioned(Part):
+    Rails:  
+        position = (-4*D, 0, 0)
+
+enamldef RightRailsPositioned(Part):
+    Rails:  
+        position = (+4*D - D/2 + B/4, 0, 0)
+
+enamldef Post(Part):
+    attr h
+    Box:
+        dx=B
+        dy=B
+        dz = h
+        position = (0, 0, -B/2)
+
+enamldef LeftPosts(Part):
+    Cut:
+        Part:
+            Post: 
+                h = 6 *D
+                position = (-B_cut, -3*W, D*3/2)
+            Post:
+                h = 6*D
+                position = (-B_cut, 3*W-B, D*3/2)
+            Post:
+                h = 5* D
+                position = (-B_cut, -9*W-B*2, D*3/2)
+            Post:
+                h = 5* D
+                position = (-B_cut, 9*W + B, D*3/2)
+            Post:
+                h = 4* D
+                position = (-B_cut, -16*W-B*3, D*3/2)
+            Post:
+                h = 4* D
+                position = (-B_cut, 16*W + 2*B, D*3/2)
+        Rails: pass
+
+enamldef Braces(Part):
+    pass
+
+enamldef FrontBarsPositioned(Part):
+    Transform:
+        FrontBars: pass
+        operations = front_log_transform
+
+enamldef BackBarsPositioned(Part):
+    Transform:
+        FrontBarsPositioned: pass
+        operations = [Mirror(y=1, plane=True)]
+
+enamldef TopLogsPositioned(Part):
+    Cut:
+        TopLogs: pass
+        TopBarsPositioned: pass
+        FrontBarsPositioned: pass
+        BackBarsPositioned: pass
+
+enamldef BackLogsPositioned(Part):
+    Transform:
+        FrontLogsPositioned: pass
+        operations = [Mirror(y=1, plane=True)]
+
+enamldef SupportsPositioned(Part):
+    LeftFrontSupport: pass
+    LeftBackSupport: pass
+    Transform:
+        Part:
+            LeftFrontSupport: pass
+            LeftBackSupport: pass
+        operations = [Mirror(x=1, plane=True)]
+
+enamldef LeftPostsPositioned(Part):
+    Fuse:
+        Cut:
+            LeftPosts: 
+                position = (-4*D, 0, 0)
+            SideLogsPositioned: pass
+        PostTenons:
+            position = (-4*D, 0, 0)
+
+enamldef RightPostsPositioned(Part):
+    Transform:
+        LeftPostsPositioned: pass
+        operations = [Mirror(x=1, plane=True)]
+
+enamldef Brace1(Part):
+    attr a = 6 * W - B
+    attr b = 4 * D + B/4 
+    Transform:
+        Box:
+            dx = B/2 - 2*B_cut
+            dy = B/2
+            dz = sqrt(a*a + b*b)
+            position = (0, -dy/2, 0)
+        operations = [Rotate(angle=-atan2(a, b), direction=(1,0,0))]
+
+enamldef Brace2(Part):
+    attr a = 6 * W - B
+    attr b = 4 * D + B/4
+    Part:
+        Transform:
+            Box:
+                dx = B/2 - 2*B_cut
+                dy = B/2
+                dz = sqrt(a*a + b*b)
+                position = (0, -dy/2,  0)
+            operations = [Rotate(angle=pi+atan2(a, b), direction=(1,0,0))]
+        position = (0, 0, b)
+
+enamldef Braces(Part):
+    Cut:
+        Brace1: pass
+        Brace2: position = (-(B/2 - 2*B_cut)/2, 0, 0)
+    Cut:
+        Brace2: pass
+        Brace1: position = ((B/2 - 2*B_cut)/2, 0, 0)
+    position = (-4*D+B/8+B_cut, -3*W+B/2, 2*D)
+
+enamldef BracesPositioned(Part):
+    Cut:
+        Part:
+            Braces: pass
+            Transform:
+                Braces: pass
+                operations = [Mirror(x=1, plane=True)]
+        LeftRailsPositioned: pass
+        LeftPostsPositioned: pass
+        RightRailsPositioned: pass
+        RightPostsPositioned: pass
+
+enamldef TreadBoardsPositioned(Part):
+    # TODO: Cut here is slow?
+    Cut:
+        Part:
+            Looper:
+                iterable = ([i*W for i in range(5)]
+                                     + [-(i+1)*W for i in range(5)]
+                                     + [B + (i+5)*W for i in range(10)]
+                                     + [-B - (i+5+1)*W for i in range(10)]
+                                     + [B*2 + (i+15)*W for i in range(2)]
+                                     + [-B*2 - (i+15+1)*W for i in range(2)])
+                Chamfer:
+                    distance = 0.05 * D/4
+                    Box:
+                        dx = 10*D
+                        dy = W
+                        dz = D/4
+                        position = (-5*D, loop_item, D*3/2)
+        LeftRailsPositioned: pass
+        LeftPostsPositioned: pass
+        RightRailsPositioned: pass
+        RightPostsPositioned: pass
+
+enamldef TreadBarsPositioned(Part):
+    # TODO: Cut here is slow?
+    Cut:
+        TreadBars: pass
+
+        LeftRailsPositioned: pass
+        LeftPostsPositioned: pass
+        RightRailsPositioned: pass
+        RightPostsPositioned: pass
+          
+
+TRANS = 0.5
+
+enamldef TopLogsFinal(Part):
+    Fuse:
+        TopLogsPositioned: pass
+        color = 'sandybrown'
+        transparency = TRANS
+
+enamldef BarsFinal(Part):
+    Fuse:
+        TopBarsPositioned: pass
+        FrontBarsPositioned: pass
+        BackBarsPositioned: pass
+        color = 'sandybrown'
+        transparency = TRANS
+
+enamldef FrontLogsFinal(Part):
+    Fuse:
+        FrontLogsPositioned: pass
+        color = 'sandybrown'
+        transparency = TRANS
+
+enamldef BackLogsFinal(Part):
+    Fuse:
+        BackLogsPositioned: pass
+        color = 'sandybrown'
+        transparency = TRANS
+
+enamldef SideLogsFinal(Part):
+    Fuse:
+        SideLogsPositioned: pass
+        color = 'sandybrown'
+        transparency = TRANS
+
+enamldef SupportsFinal(Part):
+    Fuse:
+        SupportsPositioned: pass
+        color = 'sandybrown'
+        transparency = TRANS
+
+enamldef TreadsBarsFinal(Part):
+    Fuse:
+        TreadBarsPositioned: pass
+        color = 'sandybrown'
+        transparency = TRANS
+
+enamldef TreadsBoardsFinal(Part):
+    Fuse:
+        TreadBoardsPositioned: pass
+        color = 'sandybrown'
+        transparency = TRANS
+
+enamldef RailsFinal(Part):
+    Fuse:
+        LeftRailsPositioned: pass
+        RightRailsPositioned: pass
+        color = 'sandybrown'
+        transparency = TRANS
+
+enamldef PostsFinal(Part):
+    Fuse:
+        LeftPostsPositioned: pass
+        RightPostsPositioned: pass
+        color = 'sandybrown'
+        transparency = TRANS
+
+enamldef BracesFinal(Part):
+    Fuse:
+        BracesPositioned: pass
+        color = 'sandybrown'
+        transparency = TRANS
+    
+enamldef BridgeFinal(Part):
+    TopLogsFinal: pass
+    BarsFinal: pass
+    FrontLogsFinal: pass
+    BackLogsFinal: pass
+    SideLogsFinal: sides: pass
+    SupportsFinal: pass
+    TreadsBarsFinal: pass
+    TreadsBoardsFinal: pass
+    RailsFinal: pass
+    PostsFinal: pass
+    BracesFinal: pass
+    
+# TODO: exploded view layout out all parts?
+
+enamldef Assembly(Part):
+    BridgeFinal: bridge: pass
+    Sphere:
+        radius = 2*B_cut

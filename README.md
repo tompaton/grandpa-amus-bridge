@@ -26,16 +26,17 @@ there are lots of repeated parts, and by using the `Cut` operation,
 mortises could be automatically created in exactly the right locations
 for the tenons.
 
-[.enaml source](src/bridge.enaml)
+[bridge.enaml source](src/bridge.enaml)
 
 ![Rendered CAD model](output/bridge-render.png)
+
+Transparency helps see the structure and joints:
+
 ![Transparent render](output/bridge-render-transparent.png)
 
-I was able to export a .step file
-
-[exported](output/bridge.step)
-
-Imported into [FreeCAD](https://www.freecadweb.org/) and generated a drawing.
+I was able to export a [bridge.step](output/bridge.step) file which
+could be imported into [FreeCAD](https://www.freecadweb.org/) to
+generate a drawing.
 
 ![Technical drawing detail](output/bridge-drawing.png)
 [Full page drawing](output/bridge-drawing.pdf)

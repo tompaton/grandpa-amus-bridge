@@ -21,7 +21,7 @@ is required and it gets stronger under load.
 First I created a CAD model using
 [DeclaraCAD](https://declaracad.com/).
 
-[bridge.enaml source](src/bridge.enaml)
+[bridge.enaml source](https://github.com/tompaton/grandpa-amus-bridge/blob/master/src/bridge.enaml)
 
 This worked pretty well as there are lots of repeated parts, and by
 using the `Cut` operation, mortises could be automatically created in

@@ -41,6 +41,11 @@ generate a drawing.
 
 [Full page drawing](output/bridge-drawing.pdf) with other elevation views.
 
+And after converting that to
+[bridge.stl](https://github.com/tompaton/grandpa-amus-bridge/blob/master/output/bridge.stl)
+it should be viewable in 3D everywhere.
+
+![bridge.stl](output/bridge.stl)
 
 ## Scale model
 

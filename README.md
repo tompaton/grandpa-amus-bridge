@@ -4,17 +4,29 @@ Model of the traditional Chinese bridge constructed by Grandpa Amu
 
 # Grandpa Amu's Bridge
 
-frame capture
+I found this traditional Chinese bridge design and construction
+captivating.  The interlocking pieces mean that no fasteners or glue
+is required and it gets stronger under load.
 
-youtube links
+(Construction video)[https://www.youtube.com/watch?v=PYkgEf3eWqA] and
+(more, because who can get enough)[https://www.youtube.com/watch?v=iSPAK3mcI3c]
+
+![Bridge from the side](photos/side.jpg)
+
+![Bridge from the emd](photos/end.jpg)
+
 
 ## CAD model
 
-declaracad, .enaml file
+First I created a CAD model using
+(DeclaraCAD)[https://declaracad.com/].
 
-[source](src/bridge.enaml)
+This worked pretty well as
+there are lots of repeated parts, and by using the `Cut` operation,
+mortises could be automatically created in exactly the right locations
+for the tenons.
 
-### Rendered images
+[.enaml source](src/bridge.enaml)
 
 ![Rendered CAD model](output/bridge-render.png)
 ![Transparent render](output/bridge-render-transparent.png)
@@ -23,7 +35,7 @@ I was able to export a .step file
 
 [exported](output/bridge.step)
 
-Imported into FreeCAD and generated a drawing.
+Imported into [FreeCAD](https://www.freecadweb.org/) and generated a drawing.
 
 ![Technical drawing detail](output/bridge-drawing.png)
 [Full page drawing](output/bridge-drawing.pdf)
@@ -34,8 +46,8 @@ Imported into FreeCAD and generated a drawing.
 ### Materials
 
 * 8mm x 1200mm Tasmanian oak round dowel (2 pieces)
-* 6mm x 6mm x 1200mm Tasmanian oak square dowel (2 pieces)
-* 3mm x 100mm x 1000mm balsa sheet (1 piece)
+* 6mm x 6mm x 1200mm Tasmanian oak dressed all round moulding (2 pieces)
+* 2.5mm x 100mm x 915mm balsa sheet (1 piece)
 
 There wasn't much waste, probably about 20mm left from each of the
 round and square dowels.  Only 1/3 of the balsa sheet was needed.
@@ -50,8 +62,9 @@ round and square dowels.  Only 1/3 of the balsa sheet was needed.
 
 ### Construction
 
-Construction was done by eye, cutting with the craft knife when it
-would have been more sensible to make a jig to drill mortises.
+Even though I created the CAD model and drawings, construction was
+done by eye, cutting with the craft knife when it would have been more
+sensible to make a jig to drill out mortise holes.
 
 Rails were created by splitting the square dowel.
 
@@ -73,7 +86,7 @@ It was then finished with a few coats of shellac.
 ![Underside detail](photos/20200822_103346.jpg)
 
 
-## Next steps
+## Next steps?
 
 * 3D printed plastic model
-* paper model
+* Paper model

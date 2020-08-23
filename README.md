@@ -45,8 +45,6 @@ And after converting that to
 [bridge.stl](https://github.com/tompaton/grandpa-amus-bridge/blob/master/output/bridge.stl)
 it should be viewable in 3D everywhere.
 
-![bridge.stl](output/bridge.stl)
-
 ## Scale model
 
 Even though I created the CAD model and drawings, construction was

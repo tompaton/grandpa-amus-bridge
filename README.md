@@ -8,8 +8,8 @@ I found this traditional Chinese bridge design and construction
 captivating.  The interlocking pieces mean that no fasteners or glue
 is required and it gets stronger under load.
 
-(Construction video)[https://www.youtube.com/watch?v=PYkgEf3eWqA] and
-(more, because who can get enough)[https://www.youtube.com/watch?v=iSPAK3mcI3c]
+[Construction video](https://www.youtube.com/watch?v=PYkgEf3eWqA) and
+[more, because who can get enough](https://www.youtube.com/watch?v=iSPAK3mcI3c)
 
 ![Bridge from the side](photos/side.jpg)
 
@@ -19,7 +19,7 @@ is required and it gets stronger under load.
 ## CAD model
 
 First I created a CAD model using
-(DeclaraCAD)[https://declaracad.com/].
+[DeclaraCAD](https://declaracad.com/).
 
 This worked pretty well as
 there are lots of repeated parts, and by using the `Cut` operation,
